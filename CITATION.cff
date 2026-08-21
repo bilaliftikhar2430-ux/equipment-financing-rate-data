@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this dataset, please cite it as below."
+title: "Equipment Financing Rate Report"
+type: dataset
+authors:
+  - name: "Equipment Capital Index"
+    website: "https://www.equipmentcapitalindex.com"
+url: "https://github.com/bilaliftikhar2430-ux/equipment-financing-rate-data"
+repository: "https://github.com/bilaliftikhar2430-ux/equipment-financing-rate-data"
+abstract: >-
+  Aggregate commercial equipment financing rate and estimated monthly payment
+  benchmarks by category, computed from real per-machine price and rate data
+  tracked by Equipment Capital Index (https://www.equipmentcapitalindex.com/press).
+license: CC-BY-4.0
+version: 1.0.0
+date-released: "2026-08-20"
