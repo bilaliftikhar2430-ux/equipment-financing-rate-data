@@ -1,10 +1,13 @@
 # Equipment Financing Rate Data
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22080110.svg)](https://doi.org/10.5281/zenodo.22080110)
+
 Open, self-updating dataset of aggregate commercial equipment financing rate
 and estimated monthly payment benchmarks, by category.
 
 **Source:** [Equipment Capital Index](https://www.equipmentcapitalindex.com/press)
 **Live figures & methodology:** https://www.equipmentcapitalindex.com/methodology
+**Permanent citable DOI:** https://doi.org/10.5281/zenodo.22080110
 **License:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — free to use, cite, or redistribute with attribution.
 
 ## What this is
@@ -53,7 +56,7 @@ the numbers changed. No manual maintenance.
 
 ```
 Equipment Capital Index, "Equipment Financing Rate Report"
-https://www.equipmentcapitalindex.com/press
+https://doi.org/10.5281/zenodo.22080110
 ```
 
 Attribution is appreciated, not required, under CC BY 4.0.
