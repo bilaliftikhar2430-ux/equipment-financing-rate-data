@@ -1,48 +1,48 @@
 {
   "$schema": "https://www.equipmentcapitalindex.com/press",
-  "generated_at": "2026-08-25T06:57:47.837Z",
-  "data_as_of": "2026-08-24T20:03:14.246634+00:00",
+  "generated_at": "2026-08-27T08:22:12.164Z",
+  "data_as_of": "2026-08-27T08:19:52.169271+00:00",
   "source": "https://www.equipmentcapitalindex.com",
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "methodology": "https://www.equipmentcapitalindex.com/methodology",
-  "total_machines_tracked": 449,
+  "total_machines_tracked": 499,
   "site_avg_apr_percent": 8.17,
-  "site_avg_estimated_monthly_payment_usd": 2954,
+  "site_avg_estimated_monthly_payment_usd": 3094,
   "categories": [
     {
       "category": "heavy-construction",
       "label": "Heavy Construction",
-      "machines_tracked": 222,
+      "machines_tracked": 246,
       "avg_apr_percent": 8.25,
-      "avg_estimated_monthly_payment_usd": 3272
+      "avg_estimated_monthly_payment_usd": 3514
     },
     {
       "category": "agriculture",
       "label": "Agriculture",
-      "machines_tracked": 84,
+      "machines_tracked": 93,
       "avg_apr_percent": 7.75,
-      "avg_estimated_monthly_payment_usd": 4411
+      "avg_estimated_monthly_payment_usd": 4590
     },
     {
       "category": "trucking-fleet",
       "label": "Trucking Fleet",
-      "machines_tracked": 63,
+      "machines_tracked": 70,
       "avg_apr_percent": 8,
-      "avg_estimated_monthly_payment_usd": 2501
+      "avg_estimated_monthly_payment_usd": 2466
     },
     {
       "category": "power-equipment",
       "label": "Power Equipment",
-      "machines_tracked": 44,
+      "machines_tracked": 49,
       "avg_apr_percent": 8.5,
-      "avg_estimated_monthly_payment_usd": 957
+      "avg_estimated_monthly_payment_usd": 929
     },
     {
       "category": "material-handling",
       "label": "Material Handling",
-      "machines_tracked": 36,
+      "machines_tracked": 41,
       "avg_apr_percent": 8.5,
-      "avg_estimated_monthly_payment_usd": 825
+      "avg_estimated_monthly_payment_usd": 838
     }
   ]
 }
