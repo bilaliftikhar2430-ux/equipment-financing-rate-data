@@ -5,6 +5,19 @@ on:
     - cron: '0 6 */3 * *'
   workflow_dispatch:
 
+# Every scheduled/manual run pushes to main twice (rate-report.json, then the
+# Zenodo deposition id). Two overlapping runs -- e.g. a manual re-run fired
+# while a scheduled run is still in flight -- both check out the same base
+# commit and race to push, so the second one always dies with a plain
+# non-fast-forward rejection (the actual root cause of the Sept 1/4/7
+# failures -- not a permissions issue, `contents: write` below was already
+# correct). `cancel-in-progress: false` queues the second run instead of
+# killing the first mid-write, so an in-flight commit/Zenodo-publish can't
+# be torn down halfway through.
+concurrency:
+  group: update-rate-data
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -36,7 +49,18 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "Update rate data [automated]"
-            git push
+            # Belt-and-suspenders alongside the concurrency group above: if
+            # main still moved between checkout and push (e.g. a manual
+            # commit from outside this workflow), rebase onto the new tip
+            # and retry instead of failing outright.
+            for attempt in 1 2 3; do
+              if git push; then
+                break
+              fi
+              echo "Push rejected (attempt $attempt/3) -- fetching and rebasing before retry."
+              git fetch origin main
+              git rebase origin/main
+            done
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -50,5 +74,14 @@ jobs:
         if: steps.commit.outputs.changed == 'true'
         run: |
           git add .zenodo-deposition-id
-          git diff --cached --quiet || git commit -m "Update Zenodo deposition id [automated]"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Update Zenodo deposition id [automated]"
+            for attempt in 1 2 3; do
+              if git push; then
+                break
+              fi
+              echo "Push rejected (attempt $attempt/3) -- fetching and rebasing before retry."
+              git fetch origin main
+              git rebase origin/main
+            done
+          fi
