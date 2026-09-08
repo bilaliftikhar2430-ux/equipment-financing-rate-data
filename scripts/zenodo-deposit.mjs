@@ -73,6 +73,33 @@ async function createNewVersion(existingId) {
   return draftId;
 }
 
+async function discardDraft(draftId) {
+  return zenodoFetch(`/deposit/depositions/${draftId}/actions/discard`, { method: 'POST' });
+}
+
+// Zenodo only allows one unpublished draft per concept at a time. If a prior
+// run got interrupted after creating a draft but before publishing it (e.g.
+// the git-push race this same workflow just had), the concept is left with
+// a stale draft, and calling `actions/newversion` again fails with a 400
+// ("Please remove all files first" -- confirmed from a real failed run,
+// 2026-09-08 -- not a guess). Recover by discarding that stale draft and
+// retrying once, instead of failing outright every run after the first
+// interruption.
+async function createNewVersionWithRecovery(existingId) {
+  try {
+    return await createNewVersion(existingId);
+  } catch (err) {
+    console.log('newversion failed, checking for a stale unpublished draft to discard:', err.message);
+    const parent = await zenodoFetch(`/deposit/depositions/${existingId}`);
+    const staleDraftUrl = parent.links.latest_draft;
+    if (!staleDraftUrl) throw err;
+    const staleDraftId = staleDraftUrl.split('/').pop();
+    console.log(`Discarding stale draft ${staleDraftId} and retrying newversion.`);
+    await discardDraft(staleDraftId);
+    return await createNewVersion(existingId);
+  }
+}
+
 async function uploadFile(depositionId, bucketUrl) {
   const fileBuffer = readFileSync(DATA_FILE);
   const res = await fetch(`${bucketUrl}/rate-report.json?access_token=${ZENODO_TOKEN}`, {
@@ -96,7 +123,7 @@ async function main() {
   } else {
     const existingId = readFileSync(IDS_FILE, 'utf-8').trim();
     console.log(`Existing deposition ${existingId} found -- creating a new version.`);
-    depositionId = await createNewVersion(existingId);
+    depositionId = await createNewVersionWithRecovery(existingId);
     const dep = await zenodoFetch(`/deposit/depositions/${depositionId}`);
     bucketUrl = dep.links.bucket;
     // Remove the old file copy carried over into the new draft version
