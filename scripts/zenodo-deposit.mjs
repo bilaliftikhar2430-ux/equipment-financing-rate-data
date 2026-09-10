@@ -51,9 +51,19 @@ const METADATA = {
 };
 
 async function zenodoFetch(urlPath, options = {}) {
-  const res = await fetch(`${ZENODO_BASE}${urlPath}?access_token=${ZENODO_TOKEN}`, {
+  // Auth via the `Authorization: Bearer` header, NOT the `?access_token=`
+  // query parameter. As of the 2026-09-10 run, Zenodo's edge rejects
+  // query-parameter tokens with a bare-HTML "403 Forbidden" (distinct from
+  // the API's own JSON 403s) -- confirmed against a real failed run. Header
+  // auth is also Zenodo's documented-preferred method (zenodo-rdm#1080)
+  // and keeps the token out of URL/proxy logs.
+  const res = await fetch(`${ZENODO_BASE}${urlPath}`, {
     ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${ZENODO_TOKEN}`,
+      ...(options.headers || {}),
+    },
   });
   if (!res.ok) {
     throw new Error(`Zenodo API ${options.method || 'GET'} ${urlPath} failed: ${res.status} ${await res.text()}`);
@@ -102,9 +112,12 @@ async function createNewVersionWithRecovery(existingId) {
 
 async function uploadFile(depositionId, bucketUrl) {
   const fileBuffer = readFileSync(DATA_FILE);
-  const res = await fetch(`${bucketUrl}/rate-report.json?access_token=${ZENODO_TOKEN}`, {
+  // Same header-auth switch as zenodoFetch -- the bucket/files endpoint is
+  // on the same edge that now rejects `?access_token=`.
+  const res = await fetch(`${bucketUrl}/rate-report.json`, {
     method: 'PUT',
     body: fileBuffer,
+    headers: { Authorization: `Bearer ${ZENODO_TOKEN}` },
   });
   if (!res.ok) throw new Error(`File upload failed: ${res.status} ${await res.text()}`);
 }
