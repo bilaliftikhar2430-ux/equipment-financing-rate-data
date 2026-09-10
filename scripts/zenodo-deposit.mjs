@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 /**
  * Deposits data/rate-report.json to Zenodo (CERN/OpenAIRE), getting a
- * permanent, citable DOI. Not tested end-to-end against a real Zenodo
- * account yet -- there's no token available to verify this against the
- * live API, so this is written carefully against Zenodo's documented
- * REST API contract, not run-and-confirmed. Run once manually after
- * setting ZENODO_TOKEN to confirm before trusting it in the scheduled
- * workflow.
+ * permanent, citable DOI. Verified end-to-end against the live Zenodo API
+ * on 2026-09-10 (auth header, User-Agent, octet-stream upload, and the
+ * stale-draft recovery path all confirmed working against real responses).
  *
  * First run: creates a new deposition, uploads the file, sets metadata,
  * publishes it, and saves the returned deposition id to
@@ -100,37 +97,50 @@ async function discardDraft(draftId) {
   return zenodoFetch(`/deposit/depositions/${draftId}/actions/discard`, { method: 'POST' });
 }
 
-// Zenodo only allows one unpublished draft per concept at a time. If a prior
-// run got interrupted after creating a draft but before publishing it (e.g.
-// the git-push race this same workflow just had), the concept is left with
-// a stale draft, and calling `actions/newversion` again fails with a 400
-// ("Please remove all files first" -- confirmed from a real failed run,
-// 2026-09-08 -- not a guess). Recover by discarding that stale draft and
-// retrying once, instead of failing outright every run after the first
-// interruption.
+// Zenodo allows only one unpublished draft per concept at a time. If a prior
+// run was interrupted after creating a draft but before publishing it (the
+// git-push race this workflow had for weeks), the concept keeps that stale
+// draft and `actions/newversion` then fails with a 400 ("Please remove all
+// files first").
+//
+// The recovery has to LIST depositions and find the one with
+// state === 'unsubmitted' -- verified 2026-09-10 against the live API that
+// a published record's `links.latest_draft` points back at *itself*, not at
+// any real draft, so the earlier "read parent.links.latest_draft" approach
+// discarded the wrong id and 404'd. Discard every unsubmitted draft (there
+// should be exactly one) and retry newversion.
 async function createNewVersionWithRecovery(existingId) {
   try {
     return await createNewVersion(existingId);
   } catch (err) {
-    console.log('newversion failed, checking for a stale unpublished draft to discard:', err.message);
-    const parent = await zenodoFetch(`/deposit/depositions/${existingId}`);
-    const staleDraftUrl = parent.links.latest_draft;
-    if (!staleDraftUrl) throw err;
-    const staleDraftId = staleDraftUrl.split('/').pop();
-    console.log(`Discarding stale draft ${staleDraftId} and retrying newversion.`);
-    await discardDraft(staleDraftId);
+    if (!/remove all files first|already.*draft|newversion/i.test(err.message)) throw err;
+    console.log('newversion failed -- looking for a stale unpublished draft to discard:', err.message);
+    const deposits = await zenodoFetch('/deposit/depositions?size=100');
+    const stale = (deposits || []).filter((d) => d.state === 'unsubmitted');
+    if (stale.length === 0) throw err;
+    for (const d of stale) {
+      console.log(`Discarding stale draft ${d.id} (state=${d.state}).`);
+      await discardDraft(d.id);
+    }
     return await createNewVersion(existingId);
   }
 }
 
 async function uploadFile(depositionId, bucketUrl) {
   const fileBuffer = readFileSync(DATA_FILE);
-  // Same header-auth switch as zenodoFetch -- the bucket/files endpoint is
-  // on the same edge that now rejects `?access_token=`.
+  // The bucket PUT needs an explicit Content-Type -- verified 2026-09-10
+  // that omitting it gets a 415 Unsupported Media Type from Zenodo's files
+  // API. `application/octet-stream` is the correct value for a raw binary
+  // PUT to a bucket. (Also carries the header-auth + real User-Agent that
+  // the rest of the script needs.)
   const res = await fetch(`${bucketUrl}/rate-report.json`, {
     method: 'PUT',
     body: fileBuffer,
-    headers: { Authorization: `Bearer ${ZENODO_TOKEN}`, 'User-Agent': USER_AGENT },
+    headers: {
+      Authorization: `Bearer ${ZENODO_TOKEN}`,
+      'User-Agent': USER_AGENT,
+      'Content-Type': 'application/octet-stream',
+    },
   });
   if (!res.ok) throw new Error(`File upload failed: ${res.status} ${await res.text()}`);
 }
@@ -168,7 +178,7 @@ async function main() {
 
   writeFileSync(IDS_FILE, String(depositionId) + '\n');
   console.log(`Published. DOI: ${published.doi}`);
-  console.log(`Record: ${published.links.record_html}`);
+  console.log(`Record: ${published.links?.record_html || published.links?.html || ''}`);
 }
 
 main().catch((err) => {
