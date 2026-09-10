@@ -27,6 +27,17 @@ const ZENODO_BASE = process.env.ZENODO_SANDBOX === 'true' ? 'https://sandbox.zen
 const IDS_FILE = path.join(__dirname, '..', '.zenodo-deposition-id');
 const DATA_FILE = path.join(__dirname, '..', 'data', 'rate-report.json');
 
+// Node's built-in fetch (undici) sends `User-Agent: node`. As of the
+// 2026-09-10 runs, Zenodo's edge WAF returns a bare-HTML "403 Forbidden"
+// with a support reference code (not the API's own JSON 403) for every
+// authenticated /deposit call -- the classic "works from curl and a
+// browser, blocked from a script" signature, i.e. a UA-based block that
+// almost certainly tightened during Zenodo's 2026-09-07/08 outage
+// recovery. A real, identifiable UA is both the fix and good API-citizen
+// practice.
+const USER_AGENT =
+  'equipment-financing-rate-data-bot/1.0 (+https://github.com/bilaliftikhar2430-ux/equipment-financing-rate-data)';
+
 if (!ZENODO_TOKEN) throw new Error('Missing required environment variable: ZENODO_TOKEN');
 
 const METADATA = {
@@ -62,6 +73,8 @@ async function zenodoFetch(urlPath, options = {}) {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${ZENODO_TOKEN}`,
+      'User-Agent': USER_AGENT,
+      Accept: 'application/json',
       ...(options.headers || {}),
     },
   });
@@ -117,7 +130,7 @@ async function uploadFile(depositionId, bucketUrl) {
   const res = await fetch(`${bucketUrl}/rate-report.json`, {
     method: 'PUT',
     body: fileBuffer,
-    headers: { Authorization: `Bearer ${ZENODO_TOKEN}` },
+    headers: { Authorization: `Bearer ${ZENODO_TOKEN}`, 'User-Agent': USER_AGENT },
   });
   if (!res.ok) throw new Error(`File upload failed: ${res.status} ${await res.text()}`);
 }
