@@ -1,27 +1,27 @@
 {
   "$schema": "https://www.equipmentcapitalindex.com/press",
-  "generated_at": "2026-09-16T11:16:25.275Z",
-  "data_as_of": "2026-09-03T08:13:53.060071+00:00",
+  "generated_at": "2026-09-19T10:41:45.681Z",
+  "data_as_of": "2026-09-17T15:50:35.165527+00:00",
   "source": "https://www.equipmentcapitalindex.com",
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "methodology": "https://www.equipmentcapitalindex.com/methodology",
-  "total_machines_tracked": 499,
-  "site_avg_apr_percent": 8.17,
-  "site_avg_estimated_monthly_payment_usd": 3094,
+  "total_machines_tracked": 549,
+  "site_avg_apr_percent": 8.16,
+  "site_avg_estimated_monthly_payment_usd": 3179,
   "categories": [
     {
       "category": "heavy-construction",
       "label": "Heavy Construction",
-      "machines_tracked": 246,
+      "machines_tracked": 263,
       "avg_apr_percent": 8.25,
-      "avg_estimated_monthly_payment_usd": 3514
+      "avg_estimated_monthly_payment_usd": 3684
     },
     {
       "category": "agriculture",
       "label": "Agriculture",
-      "machines_tracked": 93,
+      "machines_tracked": 117,
       "avg_apr_percent": 7.75,
-      "avg_estimated_monthly_payment_usd": 4590
+      "avg_estimated_monthly_payment_usd": 4427
     },
     {
       "category": "trucking-fleet",
@@ -33,16 +33,16 @@
     {
       "category": "power-equipment",
       "label": "Power Equipment",
-      "machines_tracked": 49,
+      "machines_tracked": 56,
       "avg_apr_percent": 8.5,
-      "avg_estimated_monthly_payment_usd": 929
+      "avg_estimated_monthly_payment_usd": 903
     },
     {
       "category": "material-handling",
       "label": "Material Handling",
-      "machines_tracked": 41,
+      "machines_tracked": 43,
       "avg_apr_percent": 8.5,
-      "avg_estimated_monthly_payment_usd": 838
+      "avg_estimated_monthly_payment_usd": 821
     }
   ]
 }
