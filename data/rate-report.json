@@ -1,48 +1,48 @@
 {
   "$schema": "https://www.equipmentcapitalindex.com/press",
-  "generated_at": "2026-09-22T11:20:31.497Z",
-  "data_as_of": "2026-09-17T15:50:35.165527+00:00",
+  "generated_at": "2026-09-25T11:35:56.076Z",
+  "data_as_of": "2026-09-24T15:54:30.804688+00:00",
   "source": "https://www.equipmentcapitalindex.com",
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "methodology": "https://www.equipmentcapitalindex.com/methodology",
-  "total_machines_tracked": 549,
-  "site_avg_apr_percent": 8.16,
-  "site_avg_estimated_monthly_payment_usd": 3179,
+  "total_machines_tracked": 599,
+  "site_avg_apr_percent": 8.15,
+  "site_avg_estimated_monthly_payment_usd": 3228,
   "categories": [
     {
       "category": "heavy-construction",
       "label": "Heavy Construction",
-      "machines_tracked": 263,
+      "machines_tracked": 280,
       "avg_apr_percent": 8.25,
-      "avg_estimated_monthly_payment_usd": 3684
+      "avg_estimated_monthly_payment_usd": 3729
     },
     {
       "category": "agriculture",
       "label": "Agriculture",
-      "machines_tracked": 117,
+      "machines_tracked": 136,
       "avg_apr_percent": 7.75,
-      "avg_estimated_monthly_payment_usd": 4427
+      "avg_estimated_monthly_payment_usd": 4451
     },
     {
       "category": "trucking-fleet",
       "label": "Trucking Fleet",
-      "machines_tracked": 70,
+      "machines_tracked": 76,
       "avg_apr_percent": 8,
-      "avg_estimated_monthly_payment_usd": 2466
+      "avg_estimated_monthly_payment_usd": 2551
     },
     {
       "category": "power-equipment",
       "label": "Power Equipment",
-      "machines_tracked": 56,
+      "machines_tracked": 61,
       "avg_apr_percent": 8.5,
-      "avg_estimated_monthly_payment_usd": 903
+      "avg_estimated_monthly_payment_usd": 873
     },
     {
       "category": "material-handling",
       "label": "Material Handling",
-      "machines_tracked": 43,
+      "machines_tracked": 46,
       "avg_apr_percent": 8.5,
-      "avg_estimated_monthly_payment_usd": 821
+      "avg_estimated_monthly_payment_usd": 810
     }
   ]
 }
